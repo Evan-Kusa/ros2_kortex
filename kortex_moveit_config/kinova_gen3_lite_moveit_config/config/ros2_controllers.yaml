@@ -5,19 +5,19 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-    gen3_lite_joint_trajectory_controller:
+    joint_trajectory_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
-    twist_controller:
-      type: picknik_twist_controller/PicknikTwistController
+    # twist_controller:
+    #   type: picknik_twist_controller/PicknikTwistController
 
-    fault_controller:
-      type: picknik_reset_fault_controller/PicknikResetFaultController
+    # fault_controller:
+    #   type: picknik_reset_fault_controller/PicknikResetFaultController
 
     gen3_lite_2f_gripper_controller:
       type: position_controllers/GripperActionController
 
-gen3_lite_joint_trajectory_controller:
+joint_trajectory_controller:
   ros__parameters:
     joints:
       - joint_1

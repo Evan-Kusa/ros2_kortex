@@ -92,7 +92,7 @@ def generate_launch_description():
         arguments=[
             "--ros-args",
             "--log-level",
-            "fatal",
+            "info",
         ],  # MoveIt is spamming the log because of unknown '*_mimic' joints
         condition=IfCondition(launch_rviz),
     )
