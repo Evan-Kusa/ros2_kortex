@@ -68,33 +68,33 @@
             </joint>
             <!-- When simulating we need to include the rest of the gripper joints -->
             <xacro:if value="${use_fake_hardware or sim_isaac or sim_gazebo}">
-                <joint name="${prefix}right_finger_tip_joint">
-                    <param name="mimic">${prefix}right_finger_bottom_joint</param>
-                    <param name="multiplier">-1</param>
-                    <xacro:unless value="${sim_gazebo}">
-                        <command_interface name="position"/>
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                    </xacro:unless>
-                </joint>
-                <joint name="${prefix}left_finger_bottom_joint">
-                    <param name="mimic">${prefix}right_finger_bottom_joint</param>
-                    <param name="multiplier">-1</param>
-                    <xacro:unless value="${sim_gazebo}">
-                        <command_interface name="position"/>
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                    </xacro:unless>
-                </joint>
-                <joint name="${prefix}left_finger_tip_joint">
-                    <param name="mimic">${prefix}right_finger_bottom_joint</param>
-                    <param name="multiplier">-1</param>
-                    <xacro:unless value="${sim_gazebo}">
-                        <command_interface name="position"/>
-                        <state_interface name="position"/>
-                        <state_interface name="velocity"/>
-                    </xacro:unless>
-                </joint>
+                <!-- Always define mimic joints -->
+                    <joint name="${prefix}right_finger_tip_joint">
+                        <param name="mimic">${prefix}right_finger_bottom_joint</param>
+                        <param name="multiplier">-1</param>
+                        <xacro:if value="${use_fake_hardware or sim_isaac or sim_gazebo}">
+                            <state_interface name="position"/>
+                            <state_interface name="velocity"/>
+                        </xacro:if>
+                    </joint>
+
+                    <joint name="${prefix}left_finger_bottom_joint">
+                        <param name="mimic">${prefix}right_finger_bottom_joint</param>
+                        <param name="multiplier">-1</param>
+                        <xacro:if value="${use_fake_hardware or sim_isaac or sim_gazebo}">
+                            <state_interface name="position"/>
+                            <state_interface name="velocity"/>
+                        </xacro:if>
+                    </joint>
+
+                    <joint name="${prefix}left_finger_tip_joint">
+                        <param name="mimic">${prefix}right_finger_bottom_joint</param>
+                        <param name="multiplier">-1</param>
+                        <xacro:if value="${use_fake_hardware or sim_isaac or sim_gazebo}">
+                            <state_interface name="position"/>
+                            <state_interface name="velocity"/>
+                        </xacro:if>
+                    </joint>
             </xacro:if>
         </ros2_control>
     </xacro:macro>

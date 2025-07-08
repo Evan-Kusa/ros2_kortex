@@ -53,6 +53,7 @@ def launch_setup(context, *args, **kwargs):
             publish_robot_description=True, publish_robot_description_semantic=True
         )
         .planning_pipelines(pipelines=["ompl", "pilz_industrial_motion_planner"])
+        .joint_limits(file_path="config/joint_limits.yaml")
         .to_moveit_configs()
     )
 
