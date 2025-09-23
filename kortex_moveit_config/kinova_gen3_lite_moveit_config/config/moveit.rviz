@@ -27,6 +27,7 @@ Visualization Manager:
         Loop Animation: true
         State Display Time: 0.05 s
         Trajectory Topic: display_planned_path
+        Trail Step Size: 30
       Value: true
 
   Global Options:
