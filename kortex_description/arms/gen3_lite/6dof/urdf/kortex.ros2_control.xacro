@@ -151,26 +151,20 @@
         <state_interface name="velocity"/>
         <state_interface name="effort"/>
       </joint>
-      <!--<xacro:unless value="${use_fake_hardware or sim_isaac or sim_gazebo}">-->
-        <!--<xacro:unless value="${moveit_active}">-->
-        <!--
-          <joint name="${prefix}right_finger_bottom_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-          </joint>
-        -->
-       <!-- </xacro:unless> -->
-      <!-- </xacro:unless> -->
-      <!--<xacro:if value="${moveit_active}">-->
-      <xacro:unless value="${use_fake_hardware}">
+      <!-- The gripper joint has exactly one owner. The gripper's own
+           ros2_control system (see gen3_lite_2f.ros2_control.xacro) claims it
+           whenever the gripper is simulated and not driven through MoveIt;
+           this condition is the complement, so the two never both declare it.
+           Declaring it twice makes the resource manager reject the whole
+           gripper system with "Tried to insert CommandInterface with already
+           existing key". -->
+      <xacro:unless value="${(use_fake_hardware or sim_gazebo or sim_isaac) and not moveit_active}">
         <joint name="${prefix}right_finger_bottom_joint">
           <command_interface name="position"/>
           <state_interface name="position"/>
           <state_interface name="velocity"/>
         </joint>
       </xacro:unless>
-      <!--</xacro:if>-->
     </ros2_control>
   </xacro:macro>
 
