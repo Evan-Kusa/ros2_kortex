@@ -66,11 +66,13 @@
                     <param name="initial_value">0.0</param>
                 </state_interface>
             </joint>
-            <!-- When simulating we need to include the rest of the gripper joints -->
+            <!-- Follower joints. multiplier/offset must match the <mimic>
+                 tags in gen3_lite_2f_macro.xacro. -->
             <xacro:if value="${use_fake_hardware or sim_isaac or sim_gazebo}">
                 <joint name="${prefix}right_finger_tip_joint">
                     <param name="mimic">${prefix}right_finger_bottom_joint</param>
-                    <param name="multiplier">-1</param>
+                    <param name="multiplier">-0.276</param>
+                    <param name="offset">-0.1</param>
                     <xacro:unless value="${sim_gazebo}">
                         <state_interface name="position"/>
                         <state_interface name="velocity"/>
@@ -78,7 +80,8 @@
                 </joint>
                 <joint name="${prefix}left_finger_bottom_joint">
                     <param name="mimic">${prefix}right_finger_bottom_joint</param>
-                    <param name="multiplier">-1</param>
+                    <param name="multiplier">1.0</param>
+                    <param name="offset">0.0</param>
                     <xacro:unless value="${sim_gazebo}">
                         <state_interface name="position"/>
                         <state_interface name="velocity"/>
@@ -86,7 +89,8 @@
                 </joint>
                 <joint name="${prefix}left_finger_tip_joint">
                     <param name="mimic">${prefix}right_finger_bottom_joint</param>
-                    <param name="multiplier">-1</param>
+                    <param name="multiplier">-0.276</param>
+                    <param name="offset">-0.1</param>
                     <xacro:unless value="${sim_gazebo}">
                         <state_interface name="position"/>
                         <state_interface name="velocity"/>
