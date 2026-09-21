@@ -1,10 +1,10 @@
-# ROS 2 Kortex
-> Kinova® Kortex™ is the common software platform behind all of the products in the Gen3 family (Gen3 and Gen3 lite). It unifies the inner workings of the various robots and their related external tools, like the API. <br />
+# ROS 2 KINOVA KORTEX™
+> Kinova® KINOVA KORTEX™ is the common software platform behind all of the products in the Gen3 family (Gen3 and Gen3 lite). It unifies the inner workings of the various robots and their related external tools, like the API. <br />
 > https://www.kinovarobotics.com/product/gen3-robots
 
 <center><img src="doc/resources/kinova-gen3-7dof-robotiq-2f-85.jpg" alt="Kinova Gen3 7DoF manipulator with Intel RealSense 3D Vision Module and Robotiq 2F-85 2 Finger 85mm Adaptive Gripper" style="width: 50%"/></center>
 
-ROS2 Kortex is the official ROS2 package to interact with Kortex and its related products. It is built upon the Kortex API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
+ROS2 Kortex is the official ROS2 package to interact with KINOVA KORTEX™ and its related products. It is built upon the KINOVA KORTEX™ API, documentation for which can be found in the [GitHub Kortex repository](https://github.com/Kinovarobotics/kortex).
 
 ## Build status
 
@@ -83,7 +83,7 @@ To build this repository from source or contribute back to the repository read o
    ```
 
    If you plan on simulating the robot with Gazebo, make sure to pull the additional simulation packages.
-   If you're on ROS 2 Humble, run
+   If you're on ROS 2 Jazzy, run
    ```
    vcs import src --skip-existing --input src/ros2_kortex/simulation.jazzy.repos
    ```
@@ -218,7 +218,21 @@ The Robotiq 2f 85 (or 2f 140) Gripper will be available on the Action topic:
 You can test the gripper by calling the Action server with the following command and setting the desired `position` of the gripper (`0.0=open`, `0.8=close`)
 
 ```bash
-ros2 action send_goal /robotiq_gripper_controller/gripper_cmd control_msgs/action/GripperCommand "{command:{position: 0.0, max_effort: 100.0}}"
+ros2 action send_goal /robotiq_gripper_controller/gripper_cmd control_msgs/action/ParallelGripperCommand "{command: {position: [0.0], effort: [100.0]}}"
+```
+
+#### Gen3_lite gripper
+
+The Gen3_lite gripper will be available on the Action topic:
+
+```bash
+/gen3_lite_2f_gripper_controller/gripper_cmd
+```
+
+You can test the gripper by calling the Action server with the following command and setting the desired `position` of the gripper (`0.0=open`, `0.8=close`)
+
+```bash
+ros2 action send_goal /gen3_lite_2f_gripper_controller/gripper_cmd control_msgs/action/GripperCommand "{command:{position: 0.0, max_effort: 100.0}}"
 ```
 
 #### Vision Module
@@ -276,8 +290,7 @@ The `kortex_sim_control.launch.py` launch file is designed to simulate all of ou
 ```bash
 ros2 launch kortex_bringup kortex_sim_control.launch.py \
   use_sim_time:=true \
-  launch_rviz:=false \
-  robot_controller:=joint_trajectory_controller
+  launch_rviz:=false
 ```
 
 * `sim_gazebo` : Use Gazebo for simulation. Default value is `false`.
@@ -339,6 +352,8 @@ ros2 launch kinova_gen3_lite_moveit_config robot.launch.py \
 
 
 ## Commanding the arm (physically and in simulation)
+
+### Joint trajectory control
 You can command the arm by publishing Joint Trajectory messages directly to the joint trajectory controller:
 
 ```bash
@@ -350,17 +365,9 @@ ros2 topic pub /joint_trajectory_controller/joint_trajectory trajectory_msgs/Joi
 }" -1
 ```
 
-Depending on your robot type and its DoF, you will need to adapt the `joint_names` and `positions` properties accordingly. For the Gen3 Lite arm, the integrated gripper is considered as a joint, so to command it, it must be included in the `joint_names` array. (`0.0=open`, `1.0=close`):
+Depending on your robot type and its DoF, you will need to adapt the `joint_names` and `positions` properties accordingly.
 
-```bash
-ros2 topic pub /joint_trajectory_controller/joint_trajectory trajectory_msgs/JointTrajectory "{
-  joint_names: [joint_1, joint_2, joint_3, joint_4, joint_5, joint_6, right_finger_bottom_joint],
-  points: [
-    { positions: [0, 0, 0, 0, 0, 0, 1], time_from_start: { sec: 10 } },
-  ]
-}" -1
-```
-
+### Joint twist control
 You can also command the arm using Twist messages. Before doing so, you must active the `twist_controller` and deactivate the `joint_trajectory_controller`:
 ```bash
 ros2 service call /controller_manager/switch_controller controller_manager_msgs/srv/SwitchController "{
@@ -391,6 +398,29 @@ ros2 service call /controller_manager/switch_controller controller_manager_msgs/
   strictness: 1,
   activate_asap: true,
 }"
+```
+### Joint velocity control
+You can command joint velocities directly as well by first activating the `joint_group_velocity_controller` using the following command:
+```bash
+# switch from trajectory (position) control to velocity control
+ros2 control switch_controllers \
+  --deactivate joint_trajectory_controller \
+  --activate joint_group_velocity_controller
+```
+Then use the following command example to move the arm (velocities are in **rad/s**):
+```bash
+# command 0.3 rad/s on the last joint of a 7 DoF gen3 (zeros elsewhere)
+ros2 topic pub --once /joint_group_velocity_controller/commands std_msgs/msg/Float64MultiArray \
+  "{data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.3]}"
+
+# stop motion before switching back
+ros2 topic pub --once /joint_group_velocity_controller/commands std_msgs/msg/Float64MultiArray \
+  "{data: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}"
+
+# switch back to joint trajectory controller if needed
+ros2 control switch_controllers \
+  --deactivate joint_group_velocity_controller \
+  --activate joint_trajectory_controller
 ```
 
 ## Contents

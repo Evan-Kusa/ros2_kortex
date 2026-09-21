@@ -4,7 +4,6 @@
 
   <!-- Propagate last link name information because it is the gripper's parent link -->
   <xacro:property name="last_arm_link" value="end_effector_link"/>
-  <xacro:property name="PI" value="3.1415926535897931"/>
 
   <xacro:macro name="load_arm" params="
     parent
@@ -20,6 +19,7 @@
     session_inactivity_timeout_ms:=6000
     connection_inactivity_timeout_ms:=2000
     use_internal_bus_gripper_comm:=false
+    gripper
     gripper_joint_name
     gripper_max_velocity:=100.0
     gripper_max_force:=100.0
@@ -55,7 +55,8 @@
       use_internal_bus_gripper_comm="${use_internal_bus_gripper_comm}"
       gripper_max_velocity="${gripper_max_velocity}"
       gripper_max_force="${gripper_max_force}"
-      gripper_joint_name="${gripper_joint_name}"/>
+      gripper_joint_name="${gripper_joint_name}"
+      gripper="${gripper}"/>
 
     <joint name="${prefix}base_joint" type="fixed">
       <xacro:insert_block name="origin" />
@@ -117,8 +118,8 @@
         <child link="${prefix}shoulder_link" />
         <axis xyz="0 0 1" />
         <limit
-          lower="${-2*PI}"
-          upper="${2*PI}"
+          lower="${-2*pi}"
+          upper="${2*pi}"
           effort="39"
           velocity="1.3963" />
       </joint>
@@ -237,7 +238,7 @@
         <parent link="${prefix}forearm_link" />
         <child link="${prefix}spherical_wrist_1_link" />
         <axis xyz="0 0 1" />
-        <limit lower="${-2*PI}" upper="${2*PI}" effort="9" velocity="1.2218" />
+        <limit lower="${-2*pi}" upper="${2*pi}" effort="9" velocity="1.2218" />
       </joint>
     </xacro:if>
     <xacro:unless value="${use_external_cable}">
@@ -332,7 +333,7 @@
         <parent link="${prefix}spherical_wrist_2_link" />
         <child link="${prefix}bracelet_link" />
         <axis xyz="0 0 1" />
-        <limit lower="${-2*PI}" upper="${2*PI}" effort="9" velocity="1.2218" />
+        <limit lower="${-2*pi}" upper="${2*pi}" effort="9" velocity="1.2218" />
       </joint>
     </xacro:if>
     <xacro:unless value="${use_external_cable}">
